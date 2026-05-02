@@ -13,7 +13,6 @@ from lib.events import AudioEvent, ChatMessageEvent, Event
 from lib.openai_realtime import OUTPUT_SAMPLE_RATE, OpenAIRealtimeBridge, openai_realtime_bridge
 
 IMAGE_URL = "https://ca.slack-edge.com/T02UQK7R1QC-U07H9ETQW67-fa8609795b2b-512"
-MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 
 _jinja = Environment(
@@ -89,8 +88,6 @@ async def _handle_camera(_: web.Request) -> web.Response:
         image_url=IMAGE_URL,
         image_alt="Meetbot avatar",
         caption="Meetbot is here.",
-        music_url=MUSIC_URL,
-        music_volume=0.35,
     )
 
     return web.Response(text=html, content_type="text/html")
@@ -103,6 +100,7 @@ async def _handle_index(_: web.Request) -> web.Response:
             "Endpoints:\n"
             "- GET /camera: camera webpage\n"
             "- GET /healthz: health check\n"
+            "- WS /camera-audio: streamed bot audio for camera page\n"
             "- WS /ws: Recall realtime events\n"
         ),
         content_type="text/plain",
