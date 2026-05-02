@@ -79,6 +79,12 @@
       <form method="post" action="/add-bot">
         <button type="submit">Add bot</button>
       </form>
+
+      {% if bot_id %}
+        <form method="post" action="/enable-camera">
+          <button type="submit">Enable camera</button>
+        </form>
+      {% endif %}
     </div>
   </main>
 </body>

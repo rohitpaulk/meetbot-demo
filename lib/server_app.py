@@ -15,3 +15,13 @@ def get_camera_audio_clients(app: web.Application) -> set[web.WebSocketResponse]
     clients = app["camera_audio_clients"]
     assert isinstance(clients, set)
     return clients
+
+
+def get_bot_id(app: web.Application) -> str | None:
+    bot_id = app["bot_id"]
+    assert isinstance(bot_id, str) or bot_id is None
+    return bot_id
+
+
+def set_bot_id(app: web.Application, bot_id: str) -> None:
+    app["bot_id"] = bot_id
