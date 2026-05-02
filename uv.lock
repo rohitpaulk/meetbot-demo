@@ -1046,6 +1046,7 @@ dependencies = [
     { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "openai", extra = ["realtime"] },
     { name = "python-dotenv" },
+    { name = "requests" },
     { name = "soxr" },
 ]
 
@@ -1064,6 +1065,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "openai", extras = ["realtime"], specifier = ">=2.33.0" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "requests", specifier = ">=2.32.0" },
     { name = "soxr", specifier = ">=1.0.0" },
 ]
 

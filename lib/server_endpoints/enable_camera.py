@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 
 from aiohttp import web
 
@@ -8,7 +9,9 @@ from lib.recall import enable_camera
 from lib.server_app import get_bot_id, get_call_started, set_camera_enabled
 from lib.server_endpoints.index import render_index
 
-CAMERA_URL = "https://meetbot.ngrok.io/camera"
+
+def _camera_url() -> str:
+    return f"{os.environ['PUBLIC_BASE_URL'].rstrip('/')}/camera"
 
 
 async def handle_enable_camera(request: web.Request) -> web.Response:
@@ -22,7 +25,7 @@ async def handle_enable_camera(request: web.Request) -> web.Response:
         )
 
     try:
-        await asyncio.to_thread(enable_camera, bot_id, CAMERA_URL)
+        await asyncio.to_thread(enable_camera, bot_id, _camera_url())
     except Exception as error:
         print(f"Failed to enable camera for bot {bot_id}: {error}")
         return render_index(

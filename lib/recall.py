@@ -11,7 +11,7 @@ def create_bot(meeting_url: str, websocket_url: str) -> str:
         headers=_default_headers(),
         json={
             "meeting_url": meeting_url,
-            "bot_name": "Meeting Notetaker",
+            "bot_name": "Andy (CodeCrafters)",
             "recording_config": {
                 "audio_mixed_raw": {},
                 "realtime_endpoints": [

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import os
+from urllib.parse import urlparse, urlunparse
 
 from aiohttp import web
 
@@ -8,11 +10,16 @@ from lib.recall import create_bot
 from lib.server_app import get_call_started, set_bot_id
 from lib.server_endpoints.index import MEETING_URL, render_index
 
-WEBSOCKET_URL = "wss://meetbot.ngrok.io/ws"
+
+def _websocket_url() -> str:
+    public_base_url = os.environ["PUBLIC_BASE_URL"].rstrip("/")
+    parsed_url = urlparse(public_base_url)
+    scheme = "wss" if parsed_url.scheme == "https" else "ws"
+    return urlunparse(parsed_url._replace(scheme=scheme, path="/ws", params="", query="", fragment=""))
 
 
 def _add_bot() -> str:
-    return create_bot(MEETING_URL, WEBSOCKET_URL)
+    return create_bot(MEETING_URL, _websocket_url())
 
 
 async def handle_add_bot(request: web.Request) -> web.Response:

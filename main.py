@@ -10,7 +10,7 @@ from lib.server import server
 async def main() -> None:
     load_dotenv()
 
-    async with server("localhost", 8765):
+    async with server("0.0.0.0", 8765):
         # Keep alive so we can keep getting events
         await asyncio.Future()
 
