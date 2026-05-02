@@ -74,7 +74,7 @@ async def _handle_connection(websocket: ServerConnection) -> None:
                 print(".", end="", flush=True)
             elif event.is_chat_message():
                 assert isinstance(event, ChatMessageEvent)
-                print("Chat message from %s: %s", event.participant_name(), event.message_text())
+                print(f"Chat message from {event.participant_name()}: {event.message_text()}")
             else:
                 print("Unknown event from %s:%s", peer_name, print(repr(message)))
 
