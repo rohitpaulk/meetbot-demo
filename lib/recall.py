@@ -17,6 +17,7 @@ def create_bot(meeting_url: str, websocket_url: str) -> None:
             "meeting_url": meeting_url,
             "bot_name": "Meeting Notetaker",
             "recording_config": {
+                "audio_mixed_raw": {},
                 "realtime_endpoints": [
                     {
                         "type": "websocket",
@@ -26,7 +27,7 @@ def create_bot(meeting_url: str, websocket_url: str) -> None:
                             "audio_mixed_raw.data",
                         ],
                     }
-                ]
+                ],
             },
         },
     )

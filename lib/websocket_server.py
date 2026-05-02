@@ -4,6 +4,7 @@ import json
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from typing import Any
 
 from websockets.asyncio.server import Server, ServerConnection, serve
@@ -11,16 +12,50 @@ from websockets.asyncio.server import Server, ServerConnection, serve
 logger = logging.getLogger(__name__)
 
 
-def _format_event(message: str | bytes) -> str:
-    if isinstance(message, bytes):
-        return f"<binary event: {len(message)} bytes>"
+@dataclass
+class Event:
+    type: str
+    data: dict[str, Any]
 
-    try:
-        parsed_message: Any = json.loads(message)
-    except json.JSONDecodeError:
-        return message
+    @classmethod
+    def from_message(cls, message: str | bytes) -> Event | None:
+        if isinstance(message, bytes):
+            print("Received binary message instead of event: %d bytes", len(message))
+            return None
 
-    return json.dumps(parsed_message, indent=2, sort_keys=True)
+        try:
+            parsed_message: Any = json.loads(message)
+        except json.JSONDecodeError:
+            print(f"<non-JSON event: {len(message)} chars>")
+            return Event(type="unknown", data={"raw": message})
+
+        klass = {
+            "participant_events.chat_message": ChatMessageEvent,
+            "audio_mixed_raw.data": AudioEvent,
+        }.get(parsed_message.get("type"), Event)
+
+        return klass(type=parsed_message["type"], data=parsed_message.get("data", {}))
+
+    def is_chat_message(self) -> bool:
+        return self.type == "participant_events.chat_message"
+
+    def is_audio(self) -> bool:
+        return self.type == "audio_mixed_raw.data"
+
+    def __repr__(self) -> str:
+        return f"Event({self.type})"
+
+
+class ChatMessageEvent(Event):
+    def participant_name(self) -> str | None:
+        return self.data["data"]["participant"]["name"]
+
+    def message_text(self) -> str | None:
+        return self.data["data"]["data"]["text"]
+
+
+class AudioEvent(Event):
+    pass
 
 
 async def _handle_connection(websocket: ServerConnection) -> None:
@@ -29,7 +64,20 @@ async def _handle_connection(websocket: ServerConnection) -> None:
 
     try:
         async for message in websocket:
-            print("Websocket event from %s:\n%s", peer_name, _format_event(message))
+            event = Event.from_message(message)
+
+            if not event:
+                print("Receive invalid payload")
+                continue
+
+            if event.is_audio():
+                print(".", end="", flush=True)
+            elif event.is_chat_message():
+                assert isinstance(event, ChatMessageEvent)
+                print("Chat message from %s: %s", event.participant_name(), event.message_text())
+            else:
+                print("Unknown event from %s:%s", peer_name, print(repr(message)))
+
     except Exception:
         print("Websocket connection failed: %s", peer_name)
         raise
