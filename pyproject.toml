@@ -3,5 +3,24 @@ name = "meetbot-demo"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.10.7"
+dependencies = [
+    "google-apps-meet>=0.4.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.2",
+    "python-dotenv>=1.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.39.3",
+]
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.14"
+typeCheckingMode = "standard"
+
+[tool.ruff]
+line-length = 120
