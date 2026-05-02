@@ -48,4 +48,5 @@ class ChatMessageEvent(Event):
 
 
 class AudioEvent(Event):
-    pass
+    def buffer_base64(self) -> str:
+        return self.data["data"]["buffer"]
