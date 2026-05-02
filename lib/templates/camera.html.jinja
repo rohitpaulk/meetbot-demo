@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #2f3f65 0, #101827 55%, #070b12 100%);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    img {
+      width: min(512px, 80vw);
+      height: min(512px, 80vw);
+      border-radius: 2rem;
+      box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.45);
+      object-fit: cover;
+    }
+
+    p {
+      margin: 0;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="{{ image_url }}" alt="{{ image_alt }}">
+    <p>{{ caption }}</p>
+  </main>
+
+  <audio id="background-music" src="{{ music_url }}" autoplay loop controls></audio>
+  <script>
+    const music = document.getElementById("background-music");
+    music.volume = {{ music_volume }};
+
+    const playMusic = () => music.play().catch((error) => {
+      console.info("Browser blocked autoplay until user interaction:", error);
+    });
+
+    playMusic();
+    document.addEventListener("click", playMusic, { once: true });
+  </script>
+</body>
+</html>

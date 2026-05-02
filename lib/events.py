@@ -1,15 +1,8 @@
 from __future__ import annotations
 
 import json
-import logging
-from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
-
-from websockets.asyncio.server import Server, ServerConnection, serve
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -56,37 +49,3 @@ class ChatMessageEvent(Event):
 
 class AudioEvent(Event):
     pass
-
-
-async def _handle_connection(websocket: ServerConnection) -> None:
-    peer_name = websocket.remote_address
-    print("Websocket client connected: %s", peer_name)
-
-    try:
-        async for message in websocket:
-            event = Event.from_message(message)
-
-            if not event:
-                print("Receive invalid payload")
-                continue
-
-            if event.is_audio():
-                print(".", end="", flush=True)
-            elif event.is_chat_message():
-                assert isinstance(event, ChatMessageEvent)
-                print(f"Chat message from {event.participant_name()}: {event.message_text()}")
-            else:
-                print("Unknown event from %s:%s", peer_name, print(repr(message)))
-
-    except Exception:
-        print("Websocket connection failed: %s", peer_name)
-        raise
-    finally:
-        print("Websocket client disconnected: %s", peer_name)
-
-
-@asynccontextmanager
-async def websocket_server(host: str, port: int) -> AsyncGenerator[Server]:
-    async with serve(_handle_connection, host, port) as server:
-        print("Websocket server listening on ws://%s:%s", host, port)
-        yield server

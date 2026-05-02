@@ -5,16 +5,16 @@ import logging
 
 from dotenv import load_dotenv
 
+from lib.bot_server import bot_server
 from lib.google import create_meet
 from lib.recall import create_bot, enable_camera
-from lib.websocket_server import websocket_server
 
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     load_dotenv()
 
-    async with websocket_server("localhost", 8765):
+    async with bot_server("localhost", 8765):
         # meeting_url, space_name = _create_meet()
 
         meeting_url = "https://meet.google.com/non-sdhm-att"
@@ -23,10 +23,10 @@ async def main() -> None:
         print(f"Space created: {meeting_url}")
         print(f"Space resource: {space_name}")
 
-        bot_id = create_bot(meeting_url, "wss://meetbot.ngrok.io")
+        bot_id = create_bot(meeting_url, "wss://meetbot.ngrok.io/ws")
 
         input("Bot joined. Press Enter to enable camera...")
-        enable_camera(bot_id, "https://ccbench.org/")
+        enable_camera(bot_id, "https://meetbot.ngrok.io/camera")
 
         # Keep alive so we can keep getting events
         await asyncio.Future()
