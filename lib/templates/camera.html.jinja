@@ -50,17 +50,68 @@
     <p>{{ caption }}</p>
   </main>
 
-  <audio id="background-music" src="{{ music_url }}" autoplay loop controls></audio>
   <script>
-    const music = document.getElementById("background-music");
-    music.volume = {{ music_volume }};
+    const audioContext = new AudioContext();
+    let nextPlaybackTime = audioContext.currentTime;
 
-    const playMusic = () => music.play().catch((error) => {
-      console.info("Browser blocked autoplay until user interaction:", error);
+    const resumeAudio = () => audioContext.resume().catch((error) => {
+      console.info("Browser blocked audio until user interaction:", error);
     });
 
-    playMusic();
-    document.addEventListener("click", playMusic, { once: true });
+    const decodeBase64 = (base64) => {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+
+      for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+
+      return bytes;
+    };
+
+    const pcm16ToFloat32 = (bytes) => {
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const samples = new Float32Array(bytes.byteLength / 2);
+
+      for (let offset = 0; offset < bytes.byteLength; offset += 2) {
+        const sample = view.getInt16(offset, true);
+        samples[offset / 2] = sample < 0 ? sample / 0x8000 : sample / 0x7fff;
+      }
+
+      return samples;
+    };
+
+    const playPcm16 = (base64Audio, sampleRate) => {
+      const bytes = decodeBase64(base64Audio);
+      const samples = pcm16ToFloat32(bytes);
+      const buffer = audioContext.createBuffer(1, samples.length, sampleRate);
+      buffer.copyToChannel(samples, 0);
+
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+
+      const startTime = Math.max(nextPlaybackTime, audioContext.currentTime + 0.02);
+      source.start(startTime);
+      nextPlaybackTime = startTime + buffer.duration;
+    };
+
+    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const websocket = new WebSocket(`${wsProtocol}//${window.location.host}/camera-audio`);
+
+    websocket.addEventListener("message", (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type !== "audio") {
+        return;
+      }
+
+      resumeAudio();
+      playPcm16(message.audio, message.sampleRate);
+    });
+
+    resumeAudio();
+    document.addEventListener("click", resumeAudio, { once: true });
   </script>
 </body>
 </html>
