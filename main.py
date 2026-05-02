@@ -1,33 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 
 from dotenv import load_dotenv
 
-from lib.bot_server import bot_server
-from lib.google import create_meet
-from lib.recall import create_bot, enable_camera
+from lib.server import server
 
 
 async def main() -> None:
-    logging.basicConfig(level=logging.INFO)
     load_dotenv()
 
-    async with bot_server("localhost", 8765):
-        # meeting_url, space_name = _create_meet()
-
-        meeting_url = "https://meet.google.com/non-sdhm-att"
-        space_name = "spaces/ZMTxRI7eHe0B"
-
-        print(f"Space created: {meeting_url}")
-        print(f"Space resource: {space_name}")
-
-        bot_id = create_bot(meeting_url, "wss://meetbot.ngrok.io/ws")
-
-        input("Bot joined. Press Enter to enable camera...")
-        enable_camera(bot_id, "https://meetbot.ngrok.io/camera")
-
+    async with server("localhost", 8765):
         # Keep alive so we can keep getting events
         await asyncio.Future()
 
