@@ -22,6 +22,22 @@
       line-height: 1.5;
     }
 
+    .status {
+      border-radius: 0.75rem;
+      margin-top: 1.5rem;
+      padding: 1rem;
+    }
+
+    .status.success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -53,6 +69,10 @@
   <main>
     <h1>{{ title }}</h1>
     <p>Start the Meet call first, then add the bot when you're ready.</p>
+
+    {% if status_message %}
+      <p class="status {{ status_kind }}">{{ status_message }}</p>
+    {% endif %}
 
     <div class="actions">
       <a href="{{ meeting_url }}" target="_blank" rel="noreferrer">Start call</a>

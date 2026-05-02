@@ -14,11 +14,17 @@ _jinja = Environment(
 )
 
 
-async def handle_index(_: web.Request) -> web.Response:
+def render_index(status_message: str | None = None, status_kind: str = "success") -> web.Response:
     template = _jinja.get_template("index.html.jinja")
     html = template.render(
         title="Meetbot Demo",
         meeting_url=MEETING_URL,
+        status_message=status_message,
+        status_kind=status_kind,
     )
 
     return web.Response(text=html, content_type="text/html")
+
+
+async def handle_index(_: web.Request) -> web.Response:
+    return render_index()
