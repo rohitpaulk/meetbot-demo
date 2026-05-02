@@ -32,9 +32,9 @@ class Event:
         klass = {
             "participant_events.chat_message": ChatMessageEvent,
             "audio_mixed_raw.data": AudioEvent,
-        }.get(parsed_message.get("type"), Event)
+        }.get(parsed_message.get("event"), Event)
 
-        return klass(type=parsed_message["type"], data=parsed_message.get("data", {}))
+        return klass(type=parsed_message["event"], data=parsed_message.get("data", {}))
 
     def is_chat_message(self) -> bool:
         return self.type == "participant_events.chat_message"
