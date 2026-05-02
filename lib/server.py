@@ -15,6 +15,7 @@ from lib.server_endpoints.camera_audio import handle_camera_audio
 from lib.server_endpoints.enable_camera import handle_enable_camera
 from lib.server_endpoints.healthz import handle_healthz
 from lib.server_endpoints.index import handle_index
+from lib.server_endpoints.start_call import handle_start_call
 from lib.server_endpoints.ws import handle_ws
 
 
@@ -47,7 +48,10 @@ def _create_app(openai_bridge: OpenAIRealtimeBridge) -> web.Application:
     app["openai_bridge"] = openai_bridge
     app["camera_audio_clients"] = set()
     app["bot_id"] = None
+    app["call_started"] = False
+    app["camera_enabled"] = False
     app.router.add_get("/", handle_index)
+    app.router.add_post("/start-call", handle_start_call)
     app.router.add_post("/add-bot", handle_add_bot)
     app.router.add_post("/enable-camera", handle_enable_camera)
     app.router.add_get("/healthz", handle_healthz)

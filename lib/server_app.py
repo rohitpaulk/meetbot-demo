@@ -25,3 +25,23 @@ def get_bot_id(app: web.Application) -> str | None:
 
 def set_bot_id(app: web.Application, bot_id: str) -> None:
     app["bot_id"] = bot_id
+
+
+def get_call_started(app: web.Application) -> bool:
+    call_started = app["call_started"]
+    assert isinstance(call_started, bool)
+    return call_started
+
+
+def set_call_started(app: web.Application, call_started: bool) -> None:
+    app["call_started"] = call_started
+
+
+def get_camera_enabled(app: web.Application) -> bool:
+    camera_enabled = app["camera_enabled"]
+    assert isinstance(camera_enabled, bool)
+    return camera_enabled
+
+
+def set_camera_enabled(app: web.Application, camera_enabled: bool) -> None:
+    app["camera_enabled"] = camera_enabled

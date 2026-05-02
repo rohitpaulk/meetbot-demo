@@ -38,14 +38,41 @@
       color: #991b1b;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
+    .panel {
+      border: 1px solid #e5e7eb;
+      border-radius: 1rem;
       margin-top: 2rem;
+      padding: 1.5rem;
     }
 
-    a,
+    .step-label {
+      color: #2563eb;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .step-title {
+      font-size: 1.5rem;
+      margin: 0 0 0.75rem;
+    }
+
+    .expectation {
+      background: #f9fafb;
+      border-radius: 0.75rem;
+      margin-top: 1rem;
+      padding: 1rem;
+    }
+
+    .expectation strong {
+      color: #111827;
+    }
+
+    .actions {
+      margin-top: 1.5rem;
+    }
+
     button {
       appearance: none;
       border: 0;
@@ -68,24 +95,44 @@
 <body>
   <main>
     <h1>{{ title }}</h1>
-    <p>Start the Meet call first, then add the bot when you're ready.</p>
+    <p>Follow these steps in order. This page will show one action at a time.</p>
 
     {% if status_message %}
       <p class="status {{ status_kind }}">{{ status_message }}</p>
     {% endif %}
 
-    <div class="actions">
-      <a href="{{ meeting_url }}" target="_blank" rel="noreferrer">Start call</a>
-      <form method="post" action="/add-bot">
-        <button type="submit">Add bot</button>
-      </form>
-
-      {% if bot_id %}
-        <form method="post" action="/enable-camera">
+    <section class="panel">
+      {% if not call_started %}
+        <p class="step-label">Step 1 of 3</p>
+        <h2 class="step-title">Start the Google Meet call</h2>
+        <p>Click the button below to open the hardcoded Meet link. Join the meeting in your browser.</p>
+        <p class="expectation"><strong>What to expect:</strong> You'll leave this control page and land in Google Meet. After you join, come back to this page to add the bot.</p>
+        <form class="actions" method="post" action="/start-call">
+          <button type="submit" onclick="window.open('{{ meeting_url }}', '_blank', 'noopener');">Start call</button>
+        </form>
+      {% elif not bot_id %}
+        <p class="step-label">Step 2 of 3</p>
+        <h2 class="step-title">Add the bot to the call</h2>
+        <p>Click the button below to ask Recall to join the bot to the Meet call.</p>
+        <p class="expectation"><strong>What to expect:</strong> The bot may take a few seconds to appear in Google Meet. Once it joins, this page will show the camera step.</p>
+        <form class="actions" method="post" action="/add-bot">
+          <button type="submit">Add bot</button>
+        </form>
+      {% elif not camera_enabled %}
+        <p class="step-label">Step 3 of 3</p>
+        <h2 class="step-title">Enable the bot camera</h2>
+        <p>Wait until the bot is visible in the Meet participant list, then click below to turn on its webpage camera.</p>
+        <p class="expectation"><strong>What to expect:</strong> The bot should start showing the Meetbot avatar/video feed from <code>/camera</code>.</p>
+        <form class="actions" method="post" action="/enable-camera">
           <button type="submit">Enable camera</button>
         </form>
+      {% else %}
+        <p class="step-label">Done</p>
+        <h2 class="step-title">Bot camera is enabled</h2>
+        <p>The setup flow is complete. You should now see the bot camera in the Meet call.</p>
+        <p class="expectation"><strong>If something looks wrong:</strong> restart the server and run through the wizard again with a fresh bot.</p>
       {% endif %}
-    </div>
+    </section>
   </main>
 </body>
 </html>

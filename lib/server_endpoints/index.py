@@ -5,7 +5,7 @@ from pathlib import Path
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from lib.server_app import get_bot_id
+from lib.server_app import get_bot_id, get_call_started, get_camera_enabled
 
 MEETING_URL = "https://meet.google.com/non-sdhm-att"
 TEMPLATES_DIR = Path(__file__).parents[1] / "templates"
@@ -20,6 +20,8 @@ def render_index(
     status_message: str | None = None,
     status_kind: str = "success",
     bot_id: str | None = None,
+    call_started: bool = False,
+    camera_enabled: bool = False,
 ) -> web.Response:
     template = _jinja.get_template("index.html.jinja")
     html = template.render(
@@ -28,10 +30,16 @@ def render_index(
         status_message=status_message,
         status_kind=status_kind,
         bot_id=bot_id,
+        call_started=call_started,
+        camera_enabled=camera_enabled,
     )
 
     return web.Response(text=html, content_type="text/html")
 
 
 async def handle_index(request: web.Request) -> web.Response:
-    return render_index(bot_id=get_bot_id(request.app))
+    return render_index(
+        bot_id=get_bot_id(request.app),
+        call_started=get_call_started(request.app),
+        camera_enabled=get_camera_enabled(request.app),
+    )
