@@ -24,7 +24,9 @@ async def main() -> None:
         print(f"Space resource: {space_name}")
 
         bot_id = create_bot(meeting_url, "wss://meetbot.ngrok.io")
-        enable_camera(bot_id, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+        input("Bot joined. Press Enter to enable camera...")
+        enable_camera(bot_id, "https://ccbench.org/")
 
         # Keep alive so we can keep getting events
         await asyncio.Future()
