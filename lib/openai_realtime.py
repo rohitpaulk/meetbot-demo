@@ -63,7 +63,8 @@ class OpenAIRealtimeBridge:
                                 "rate": OPENAI_SAMPLE_RATE,
                             },
                             "turn_detection": {
-                                "type": "semantic_vad",
+                                "type": "server_vad",
+                                "silence_duration_ms": 200,
                             },
                         },
                         "output": {
